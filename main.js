@@ -7,13 +7,14 @@ import {initGrid} from './other-js/grid.js'
 import {initLight} from './other-js/light.js'
 import { moveForward, rotateLeft, rotateRight } from './other-js/movement.js';
 import { initGround } from './other-js/ground.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const scene = new THREE.Scene();
 
 const gamegrid = [
 // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -31,7 +32,7 @@ const gamegrid = [
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
@@ -40,7 +41,11 @@ const sprite = initCube(0.5, 0.5, 0.5, 0, 0);
 const renderer = initRender();
 const gridHelper = initGrid();
 const pointLight = initLight();
-const house = initCube(3, 3, 3, 3, -3)
+const house = initCube(3, 3, 3, 3, -3);
+const pillar1 = initCube(1, 100, 1, -9, -9);
+const pillar2 = initCube(1, 100, 1, -9, 9);
+const pillar3 = initCube(1, 100, 1, 9, 9);
+const pillar4 = initCube(1, 100, 1, 9, -9);
 const ground = initGround();
 
 
@@ -48,15 +53,17 @@ scene.add(sprite);
 scene.add(gridHelper);
 scene.add(pointLight);
 scene.add(house);
+scene.add(pillar1);
+scene.add(pillar2);
+scene.add(pillar3);
+scene.add(pillar4);
 scene.add(ground);
 
-// Sand texture
-// const sandTexture = new THREE.TextureLoader().load('./public/sand.jpg');
-// sandTexture.wrapS = sandTexture.wrapT = THREE.RepeatWrapping;
-// sandTexture.repeat.set(10, 10); // Adjust the number of times the texture repeats
-// const sandMaterial = new THREE.MeshPhongMaterial({ map: sandTexture });
-// ground.material = sandMaterial;
-// scene.add(ground);
+const loader = new THREE.TextureLoader();
+// loader.load('https://images.pexels.com/photos/1205301/pexels-photo-1205301.jpeg' , function(texture)
+//             {
+//              scene.background = texture;  
+//             });
 
 let orientation = "N";
 let game_positions = [10, 10];
@@ -92,6 +99,7 @@ document.addEventListener('keydown', (event) => {
 });
 
 function animate() {
+
 	requestAnimationFrame( animate );
 	renderer.render( scene, camera );
 }

@@ -4,7 +4,7 @@ import * as THREE from 'three';
 export function initGround() {
 
     const groundGeometry = new THREE.PlaneGeometry(20, 20); // Adjust sizes as needed
-    const groundMaterial = new THREE.MeshPhongMaterial(); // You can use a texture or custom material
+    const groundMaterial = new THREE.MeshPhongMaterial({color: 0x000000, transparent: true, opacity: 0.5}); // You can use a texture or custom material
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.position.set(0, 0, 0); // Adjust the value as needed
     ground.rotation.x = -Math.PI / 2;
