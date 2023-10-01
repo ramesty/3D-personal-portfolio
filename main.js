@@ -1,10 +1,12 @@
 import * as THREE from 'three';
+import { Water } from 'three/examples/jsm/objects/Water.js';
 import {initCamera} from './other-js/camera.js'
 import {initCube} from './other-js/cube.js'
 import {initRender} from './other-js/render.js'
 import {initGrid} from './other-js/grid.js'
 import {initLight} from './other-js/light.js'
-import { moveForward, rotateLeft, rotateRight } from './other-js/rotation.js';
+import { moveForward, rotateLeft, rotateRight } from './other-js/movement.js';
+import { initGround } from './other-js/ground.js';
 
 const scene = new THREE.Scene();
 
@@ -38,20 +40,25 @@ const sprite = initCube(0.5, 0.5, 0.5, 0, 0);
 const renderer = initRender();
 const gridHelper = initGrid();
 const pointLight = initLight();
-
 const house = initCube(3, 3, 3, 3, -3)
+const ground = initGround();
 
-house.material.depthTest = false;
 
 scene.add(sprite);
 scene.add(gridHelper);
 scene.add(pointLight);
 scene.add(house);
+scene.add(ground);
 
+// Sand texture
+// const sandTexture = new THREE.TextureLoader().load('./public/sand.jpg');
+// sandTexture.wrapS = sandTexture.wrapT = THREE.RepeatWrapping;
+// sandTexture.repeat.set(10, 10); // Adjust the number of times the texture repeats
+// const sandMaterial = new THREE.MeshPhongMaterial({ map: sandTexture });
+// ground.material = sandMaterial;
+// scene.add(ground);
 
-let movementSpeed = 1;
 let orientation = "N";
-
 let game_positions = [10, 10];
 
 // Keyboard event listener
@@ -61,8 +68,8 @@ document.addEventListener('keydown', (event) => {
       moveForward(orientation, game_positions, gamegrid, sprite, camera);
       break;
     case 'ArrowDown':
-      sprite.position.z += movementSpeed; // Move down
-      camera.position.z += movementSpeed;
+      // sprite.position.z += movementSpeed; // Move down
+      // camera.position.z += movementSpeed;
       break;
     case 'ArrowLeft':
       // Rotate the camera or sprite left (counter-clockwise) by 90 degrees
@@ -86,10 +93,6 @@ document.addEventListener('keydown', (event) => {
 
 function animate() {
 	requestAnimationFrame( animate );
-
-	// cube.rotation.x += 0.01;
-	// cube.rotation.y += 0.01;
-
 	renderer.render( scene, camera );
 }
 
