@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { Water } from 'three/examples/jsm/objects/Water.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import {initCamera} from './other-js/camera.js'
 import {initCube} from './other-js/cube.js'
 import {initRender} from './other-js/render.js'
@@ -8,22 +9,23 @@ import {initLight} from './other-js/light.js'
 import { moveForward, rotateLeft, rotateRight } from './other-js/movement.js';
 import { initGround } from './other-js/ground.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 const scene = new THREE.Scene();
 
 const gamegrid = [
-// 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 0
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -41,7 +43,7 @@ const sprite = initCube(0.5, 0.5, 0.5, 0, 0);
 const renderer = initRender();
 const gridHelper = initGrid();
 const pointLight = initLight();
-const house = initCube(3, 3, 3, 3, -3);
+const house = initCube(3, 0.01, 3, 3, -3);
 const pillar1 = initCube(1, 100, 1, -9, -9);
 const pillar2 = initCube(1, 100, 1, -9, 9);
 const pillar3 = initCube(1, 100, 1, 9, 9);
@@ -59,12 +61,26 @@ scene.add(pillar3);
 scene.add(pillar4);
 scene.add(ground);
 
-const loader = new THREE.TextureLoader();
-// loader.load('https://images.pexels.com/photos/1205301/pexels-photo-1205301.jpeg' , function(texture)
-//             {
-//              scene.background = texture;  
-//             });
+// Add a starfield ----------------------------------------------------------------------------
+const starsGeometry = new THREE.BufferGeometry();
+const starsMaterial = new THREE.PointsMaterial({ color: 0xFFFFFF, size: 0.05 });
 
+const starsVertices = [];
+for (let i = 0; i < 5000; i++) {
+  const x = (Math.random() - 0.5) * 2000;
+  const y = (Math.random() - 0.5) * 2000;
+  const z = (Math.random() - 0.5) * 2000;
+  starsVertices.push(x, y, z);
+}
+
+starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+const stars = new THREE.Points(starsGeometry, starsMaterial);
+scene.add(stars);
+
+// -----------------------------------------------------------------------------------------
+
+
+// Initializing important variables
 let orientation = "N";
 let game_positions = [10, 10];
 
@@ -97,6 +113,9 @@ document.addEventListener('keydown', (event) => {
   console.log(`gamex=${game_positions[0]}, gamey=${game_positions[1]}`);
   console.log(`Orientation=${orientation}`);
 });
+
+// Add OrbitControls
+// const controls = new OrbitControls(camera, renderer.domElement);
 
 function animate() {
 
